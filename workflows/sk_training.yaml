@@ -1,48 +1,48 @@
 apiVersion: argoproj.io/v1alpha1
-  kind: WorkflowTemplate
-  metadata:
-    name: sk-training-workflow 
-    annotations:
-      scenarios.ai.sap.com/name: "Scikit-learn Classification Scenario" 
-      scenarios.ai.sap.com/descripion:  "Train a Model Using Scikit-learn"
-  
-      executables.ai.sap.com/name: "Scikit-learn model training"  
-      executables.ai.sap.com/description: "Training a model using Scikit-learn and iris-dataset"
-      
-      artifacts.ai.sap.com/skldataset.kind: "dataset".
-      artifacts.ai.sap.com/sklmodel.kind: "model" 
-    labels:
-      scenarios.ai.sap.com/id: "Scikit-learn-scenario"
-      ai.sap.com/version: "1.0"
-  spec:
-    imagePullSecrets:
-      - name: skl-secret 
-    entrypoint: sklpipeline
-    arguments:
-      parameters: 
-          - name: CLASS_LABEL 
-          - name: KERNEL 
-    templates:
-    - name: sklpipeline
-      inputs:
-        artifacts:  
-          - name: skldataset 
-            path: /app/data/ 
-      outputs:
-        artifacts:
-          - name: sklmodel 
-            globalName: sklmodel 
-            path: /app/model/ 
-            archive:
-              none:   
-                {}
-      container:
-        image: docker.io/alireza321/scikit-learn-training-image:01 
-        command: ["/bin/sh", "-c"]
-        env:
-          - name: CLASS_LABEL 
-            value: "{{workflow.parameters.CLASS_LABEL}}" 
-          - name: KERNEL 
-            value: "{{workflow.parameters.KERNEL}}" 
-        args:
-          - "python /app/src/main.py"
+kind: WorkflowTemplate
+metadata:
+  name: sk-training-workflow 
+  annotations:
+    scenarios.ai.sap.com/name: "Scikit-learn Classification Scenario" 
+    scenarios.ai.sap.com/description: "Train a Model Using Scikit-learn"
+
+    executables.ai.sap.com/name: "Scikit-learn model training" 
+    executables.ai.sap.com/description: "Training a model with Scikit-learn"
+    
+    artifacts.ai.sap.com/skldataset.kind: "dataset" 
+    artifacts.ai.sap.com/sklmodel.kind: "model" 
+  labels:
+    scenarios.ai.sap.com/id: "Scikit-learn-scenario"
+    ai.sap.com/version: "1.0"
+spec:
+  imagePullSecrets:
+    - name: skl-secret 
+  entrypoint: sklpipeline
+  arguments:
+    parameters: 
+        - name: CLASS_LABEL 
+        - name: KERNEL 
+  templates:
+  - name: sklpipeline
+    inputs:
+      artifacts:  
+        - name: skldataset 
+          path: /app/data/ 
+    outputs:
+      artifacts:
+        - name: sklmodel 
+          globalName: sklmodel 
+          path: /app/model/
+          archive:
+            none:  
+              {}
+    container:
+      image: docker.io/alireza321/scikit-learn-training-image:01 
+      command: ["/bin/sh", "-c"]
+      env:
+        - name: CLASS_LABEL 
+          value: "{{workflow.parameters.CLASS_LABEL}}" 
+        - name: KERNEL 
+          value: "{{workflow.parameters.KERNEL}}" 
+      args:
+        - "python /app/src/main.py"
