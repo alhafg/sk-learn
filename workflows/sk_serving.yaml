@@ -1,0 +1,47 @@
+apiVersion: ai.sap.com/v1alpha1
+kind: ServingTemplate
+metadata:
+  name: sk-training-workflow
+  annotations:
+    scenarios.ai.sap.com/name: "Scikit-learn Classification Scenario"  
+    scenarios.ai.sap.com/description: "Serving a Model"
+
+    executables.ai.sap.com/name: "Scikit-learn model serving" 
+    executables.ai.sap.com/description: "Serving a model with Scikit-learn"
+
+    artifacts.ai.sap.com/sklmodel.kind: "model" 
+  labels:
+    scenarios.ai.sap.com/id: "Scikit-learn-scenario"
+    ai.sap.com/version: "1.0"
+spec:
+  inputs:
+    artifacts:
+      - name: sklmodel 
+  template:
+    apiVersion: "serving.kserve.io/v1beta1"
+    metadata:
+      annotations: |
+        autoscaling.knative.dev/metric: concurrency   
+        autoscaling.knative.dev/target: 1
+        autoscaling.knative.dev/targetBurstCapacity: 0
+      labels: |
+        ai.sap.com/resourcePlan: starter 
+    spec: |
+      predictor:
+        imagePullSecrets:
+          - name: skl-secret  
+        minReplicas: 1
+        maxReplicas: 5    # how much to scale
+        containers:
+        - name: kserve-container
+          image: docker.io/alireza321/scikit-learn-serving-image:01 
+          ports:
+            - containerPort: 9001    # customizable port
+              protocol: TCP
+          command: ["/bin/sh", "-c"]
+          args:
+            - >
+              set -e && echo "Starting" && gunicorn --chdir /app/src main:app -b 0.0.0.0:9001 # filename `main` flask variable `app`
+          env:
+            - name: STORAGE_URI # Required
+              value: "{{inputs.artifacts.irismodel}}" 
