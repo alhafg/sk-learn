@@ -3,12 +3,11 @@ apiVersion: argoproj.io/v1alpha1
   metadata:
     name: sk-training-workflow 
     annotations:
-      scenarios.ai.sap.com/name:"Scikit-learn Classification Scenario" 
-      scenarios.ai.sap.com/description:"Train a Model Using Scikit-learn"
+      scenarios.ai.sap.com/name: "Scikit-learn Classification Scenario" 
+      scenarios.ai.sap.com/descripion:  "Train a Model Using Scikit-learn"
   
-      executables.ai.sap.com/name:"Scikit-learn model training"  
-      executables.ai.sap.com/description: 
-      "Training a model using Scikit-learn and iris-dataset"
+      executables.ai.sap.com/name: "Scikit-learn model training"  
+      executables.ai.sap.com/description: "Training a model using Scikit-learn and iris-dataset"
       
       artifacts.ai.sap.com/skldataset.kind: "dataset".
       artifacts.ai.sap.com/sklmodel.kind: "model" 
